@@ -1,79 +1,78 @@
+// chatbot-api.js
 const CHATBOT_API_URL = 'https://chatbot-rain-production.up.railway.app';
 
 export const sendToChatbot = async (message) => {
   try {
-    console.log('🤖 Sending to Railway backend:', { 
-      url: `${CHATBOT_API_URL}/chat`,
-      message: message 
-    });
-
+    console.log('🚀 Mengirim ke API:', message);
+    
+    // Pastikan URL benar
     const response = await fetch(`${CHATBOT_API_URL}/chat`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
-      body: JSON.stringify({ 
-        message: message 
-      }),
+      body: JSON.stringify({ message: message })
     });
 
-    console.log('📡 Response status:', response.status);
-
+    console.log('📡 Status:', response.status);
+    
+    // Cek jika response tidak OK
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ Backend error:', {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText
-      });
-      throw new Error(`Backend error: ${response.status}`);
+      console.error('❌ Response tidak OK:', errorText);
+      
+      // Handle error spesifik
+      if (response.status === 404) {
+        throw new Error('Endpoint tidak ditemukan (404). Pastikan URL benar.');
+      } else if (response.status === 500) {
+        throw new Error('Server error (500). Silakan coba lagi nanti.');
+      }
+      
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
-
-    const data = await response.json();
-    console.log('✅ Backend response:', data);
-
-    if (data.reply) {
-      return data.reply;
-    }
-
-    return "Terima kasih atas pertanyaan Anda. Mohon coba lagi.";
-
-  } catch (error) {
-    console.error('❌ Chatbot connection failed:', error.message);
     
-    // Fallback ke local responses
-    return getEnhancedFallbackResponse(message);
+    // Parse response
+    const data = await response.json();
+    console.log('📦 Data response:', data);
+    
+    // SESUAIKAN DENGAN FORMAT RESPONSE BARU
+    // Response: {"message": "..."}
+    if (data.message) {
+      // Jika isinya "Use POST /chat", berarti endpoint menerima request tapi tidak memproses
+      if (data.message === "Use POST /chat") {
+        return "✅ Koneksi berhasil! Silakan tanyakan sesuatu tentang mining safety.";
+      }
+      return data.message.replace(/\*\*/g, '');
+    } 
+    // Fallback untuk format lama (jika ada)
+    else if (data.reply) {
+      return data.reply.replace(/\*\*/g, '');
+    } 
+    // Fallback lainnya
+    else {
+      console.warn('⚠️ Format response tidak dikenali:', data);
+      return JSON.stringify(data).replace(/\*\*/g, '');
+    }
+    
+  } catch (error) {
+    console.error('🔥 Error total:', error);
+    
+    // Handle error lebih spesifik
+    if (error.name === 'AbortError' || error.message.includes('timeout')) {
+      return '⏱️ Timeout: Server tidak merespons. Coba lagi.';
+    } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+      return '🌐 Error koneksi: Pastikan Anda terhubung ke internet.';
+    } else if (error.message.includes('CORS')) {
+      return '🔒 CORS Error: Server tidak mengizinkan request dari domain ini.';
+    }
+    
+    return `Error: ${error.message}\n\nCoba refresh halaman atau hubungi administrator.`;
   }
 };
 
-// Helper function untuk fallback responses (sama seperti sebelumnya)
-function getEnhancedFallbackResponse(message) {
-  const lowerMessage = message.toLowerCase();
-
-  if (lowerMessage.includes('hujan')) {
-    return `**PROTOKOL HUJAN TAMBANG** 🌧️\n\n1. Hujan ringan: Lanjut operasi dengan pengawasan\n2. Hujan sedang: Tunda pengangkutan\n3. Hujan lebat: HENTIKAN semua operasi luar\n\n**Safety first!** ⛑️`;
-  }
-
-  if (lowerMessage.includes('suhu')) {
-    return `**PROTOKOL SUHU TINGGI** 🔥\n\n• 25-35°C: Tambah istirahat\n• >35°C: Hentikan pekerjaan berat\n• Pantau gejala heat stroke\n\n**Sediakan air minum yang cukup!**`;
-  }
-
-  if (lowerMessage.includes('keselamatan')) {
-    return `**5 PILAR KESELAMATAN TAMBANG** ⛑\n\n1. KEPEMIMPINAN\n2. IDENTIFIKASI BAHAYA\n3. PENGENDALIAN RISIKO\n4. KOMPETENSI\n5. EMERGENCY RESPONSE\n\n**APD WAJIB:** Helm, sepatu safety, kacamata.`;
-  }
-
-  if (lowerMessage.includes('alat berat')) {
-    return `**CHECKLIST ALAT BERAT** 🚜\n\n1. Tekanan ban\n2. Sistem hidrolik\n3. Rem dan lampu\n4. Level fluida\n5. Pre-start inspection\n\n**Safety sebelum produktivitas!**`;
-  }
-
-  return `Terima kasih atas pertanyaan tentang **"${message}"**!\n\nSebagai Mining Safety Assistant, saya sarankan:\n1. Konsultasi dengan supervisor K3\n2. Ikuti SOP yang berlaku\n3. Gunakan APD lengkap\n4. Monitor kondisi cuaca\n\n**Safety first!** ⛑️`;
-}
-
+// Quick responses untuk button (optional)
 export const quickResponses = {
-  cuaca: "Cuaca ekstrem dapat menghentikan operasi. Monitor BMKG, siapkan rencana kontingensi.",
-  safety: "Selalu gunakan APD lengkap, ikuti prosedur, lapor kondisi tidak aman.",
-  produksi: "Optimalkan berdasarkan cuaca, maintenance, dan koordinasi tim.",
-  'alat berat': "Checklist harian wajib: ban, rem, hidrolik, lampu, fluida.",
-  hauling: "Rute aman & efisien. Pertimbangkan kondisi jalan dan cuaca.",
-  blasting: "Area harus dikosongkan, komunikasi aktif, NO blasting saat badai."
+  cuaca: "Cuaca mempengaruhi operasi tambang: jalan licin, stabilitas lereng, visibilitas.",
+  safety: "Keselamatan tambang: APD lengkap, ikuti SOP, komunikasi, emergency response.",
 };
