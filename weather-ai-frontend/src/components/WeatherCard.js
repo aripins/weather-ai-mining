@@ -38,7 +38,7 @@ const WeatherCard = ({ data }) => {
 
   return (
     <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl border border-white/20 p-6">
-      {/* Header */}
+      {/* Header - Simplified */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white">{data.location}</h2>
@@ -67,15 +67,24 @@ const WeatherCard = ({ data }) => {
 
       {/* Additional Info */}
       <div className="mt-6 pt-6 border-t border-white/20">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-bold text-white">Forecast</h3>
+          <span className="text-xs text-gray-400">Next 3 hours</span>
+        </div>
         <div className="grid grid-cols-3 gap-3">
           {Object.entries(data.forecast_hours || {}).slice(0, 3).map(([time, forecast]) => (
-            <div key={time} className="text-center p-3 bg-white/5 rounded-xl">
+            <div key={time} className="text-center p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
               <div className="font-medium text-gray-400">{time}</div>
               <div className="text-lg font-bold text-white">{forecast.temperature}°C</div>
-              <div className="text-xs text-gray-500">{forecast.rainfall}mm</div>
+              <div className="text-xs text-gray-500 flex items-center justify-center">
+                <CloudRain className="w-3 h-3 mr-1" />
+                {forecast.rainfall}mm
+              </div>
             </div>
           ))}
         </div>
+        
+        {}
       </div>
     </div>
   );

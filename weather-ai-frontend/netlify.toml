@@ -1,0 +1,29 @@
+[build]
+  command = "npm run build"
+  publish = "out"
+  functions = "functions" # Opsional jika pakai Netlify Functions
+
+[build.environment]
+  NODE_VERSION = "18"
+  NEXT_PUBLIC_API_URL = "https://your-backend-api.herokuapp.com/api"
+
+# Redirects untuk SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers untuk security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+
+# Cache control untuk static assets
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
