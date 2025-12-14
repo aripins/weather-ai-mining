@@ -5,7 +5,6 @@ import {
   Download, Droplets,
   HardHat, History,
   Mail,
-  Phone,
   RefreshCw,
   Thermometer, Wind
 } from 'lucide-react';
@@ -759,16 +758,9 @@ export default function Home() {
                 <h4 className="text-lg font-bold text-white mb-4">Call Center</h4>
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3 text-gray-300">
-                    <Phone className="w-5 h-5 text-cyan-400" />
-                    <div>
-                      <p className="text-sm">+62 21 1234 5678</p>
-                      <p className="text-xs text-gray-400">Senin - Jumat, 08:00 - 17:00</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-300">
                     <Mail className="w-5 h-5 text-cyan-400" />
                     <div>
-                      <p className="text-sm">email.asah@gmail.com</p>
+                      <p className="text-sm">f459d5y0274@student.devacademy.id</p>
                       <p className="text-xs text-gray-400">Response dalam 24 jam</p>
                     </div>
                   </div>
