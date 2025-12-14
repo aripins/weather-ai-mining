@@ -6,7 +6,7 @@ const Chatbot = ({ isOpen, onClose, weatherData }) => {
   const [messages, setMessages] = useState([
     { 
       type: 'bot', 
-      content: 'Halo! Saya **Mining Safety & Operation Assistant** 🤖\n\nSaya bisa membantu Anda dengan:\n• **Keselamatan kerja tambang (K3)** - protokol, APD, emergency response\n• **Operasional tambang** - hauling, loading, blasting, crushing\n• **Dampak cuaca** terhadap aktivitas tambang dan mitigasinya\n• **Rekomendasi teknis** berdasarkan kondisi aktual lokasi\n\n**Contoh pertanyaan:**\n"Bagaimana menangani hujan deras di lokasi?"\n"Apa protokol suhu tinggi untuk pekerja?"\n"Bagaimana safety checklist alat berat?"'
+      content: `Halo! Saya Mining Safety & Operation Assistant 🤖\n\nSaya bisa membantu Anda dengan:\n• Keselamatan kerja tambang (K3) - protokol, APD, emergency response\n• Operasional tambang - hauling, loading, blasting, crushing\n• Dampak cuaca terhadap aktivitas tambang dan mitigasinya\n• Rekomendasi teknis berdasarkan kondisi aktual lokasi\n\nContoh pertanyaan:\n"Bagaimana menangani hujan deras di lokasi?"\n"Apa protokol suhu tinggi untuk pekerja?"\n"Bagaimana safety checklist alat berat?"`
     }
   ]);
   const [input, setInput] = useState('');
@@ -67,10 +67,12 @@ const Chatbot = ({ isOpen, onClose, weatherData }) => {
       const botResponse = await sendToChatbot(input);
       
       // Deteksi apakah ini fallback response atau dari AI
-      const isFallback = botResponse.includes('Halo! Saya **Mining Safety') || 
-                         botResponse.includes('**HUJAN & OPERASI TAMBANG**') ||
-                         botResponse.includes('**MANAJEMEN SUHU TINGGI**') ||
-                         botResponse.includes('**5 PILAR KESELAMATAN TAMBANG**');
+      const isFallback = botResponse.includes('Terima kasih atas pertanyaan') || 
+                         botResponse.includes('Halo! Saya Mining Safety') ||
+                         botResponse.includes('PROTOKOL HUJAN DI TAMBANG') ||
+                         botResponse.includes('PROTOKOL SUHU TINGGI') ||
+                         botResponse.includes('5 PILAR KESELAMATAN TAMBANG') ||
+                         botResponse.includes('PROTOKOL TANGGAP DARURAT');
       
       setApiStatus(isFallback ? 'fallback' : 'connected');
       
@@ -88,7 +90,7 @@ const Chatbot = ({ isOpen, onClose, weatherData }) => {
       setApiStatus('error');
       
       // Enhanced fallback dengan konteks cuaca jika ada
-      let fallbackResponse = "**⚠️ Sementara menggunakan basis pengetahuan lokal**\n\n";
+      let fallbackResponse = "⚠️ Sementara menggunakan basis pengetahuan lokal\n\n";
       
       const lowerInput = input.toLowerCase();
       let foundKeyword = false;
@@ -104,16 +106,16 @@ const Chatbot = ({ isOpen, onClose, weatherData }) => {
       
       // Tambahkan konteks cuaca jika ada data
       if (weatherData && !foundKeyword) {
-        fallbackResponse += `\n\n**📊 Konteks Cuaca Saat Ini:**\n`;
+        fallbackResponse += `\n\n📊 Konteks Cuaca Saat Ini:\n`;
         fallbackResponse += `• Lokasi: ${weatherData.location || 'Tidak diketahui'}\n`;
         fallbackResponse += `• Suhu: ${weatherData.temperature || 'N/A'}°C\n`;
         fallbackResponse += `• Curah Hujan: ${weatherData.rainfall || 'N/A'} mm\n`;
         fallbackResponse += `• Kecepatan Angin: ${weatherData.wind_speed || 'N/A'} km/h\n\n`;
         
         if (weatherData.rainfall > 10) {
-          fallbackResponse += `**🚨 REKOMENDASI:** Hentikan operasi luar ruangan, aktifkan tim emergency.`;
+          fallbackResponse += `🚨 REKOMENDASI: Hentikan operasi luar ruangan, aktifkan tim emergency.`;
         } else if (weatherData.temperature > 35) {
-          fallbackResponse += `**⚠️ REKOMENDASI:** Tambah frekuensi istirahat, sediakan air minum ekstra.`;
+          fallbackResponse += `⚠️ REKOMENDASI: Tambah frekuensi istirahat, sediakan air minum ekstra.`;
         }
       }
       
@@ -163,26 +165,26 @@ const Chatbot = ({ isOpen, onClose, weatherData }) => {
   const addWeatherContext = () => {
     if (!weatherData) return;
     
-    let weatherContext = `**🌤️ KONTEKS CUACA UNTUK REKOMENDASI**\n\n`;
-    weatherContext += `**Lokasi:** ${weatherData.location || 'Area Tambang'}\n`;
-    weatherContext += `**Suhu:** ${weatherData.temperature || 'N/A'}°C\n`;
-    weatherContext += `**Curah Hujan:** ${weatherData.rainfall || 'N/A'} mm\n`;
-    weatherContext += `**Kelembaban:** ${weatherData.humidity || 'N/A'}%\n`;
-    weatherContext += `**Kecepatan Angin:** ${weatherData.wind_speed || 'N/A'} km/h\n\n`;
+    let weatherContext = `🌤️ KONTEKS CUACA UNTUK REKOMENDASI\n\n`;
+    weatherContext += `Lokasi: ${weatherData.location || 'Area Tambang'}\n`;
+    weatherContext += `Suhu: ${weatherData.temperature || 'N/A'}°C\n`;
+    weatherContext += `Curah Hujan: ${weatherData.rainfall || 'N/A'} mm\n`;
+    weatherContext += `Kelembaban: ${weatherData.humidity || 'N/A'}%\n`;
+    weatherContext += `Kecepatan Angin: ${weatherData.wind_speed || 'N/A'} km/h\n\n`;
     
     // Tambahkan rekomendasi berdasarkan kondisi
     if (weatherData.rainfall > 10) {
-      weatherContext += `**🚨 STATUS:** HUJAN LEBAT - Hentikan operasi luar ruangan\n`;
-      weatherContext += `**📋 TINDAKAN:**\n1. Aktifkan tim emergency\n2. Evakuasi area rendah\n3. Periksa sistem drainase\n4. Pantau kondisi lereng`;
+      weatherContext += `🚨 STATUS: HUJAN LEBAT - Hentikan operasi luar ruangan\n`;
+      weatherContext += `📋 TINDAKAN:\n1. Aktifkan tim emergency\n2. Evakuasi area rendah\n3. Periksa sistem drainase\n4. Pantau kondisi lereng`;
     } else if (weatherData.temperature > 35) {
-      weatherContext += `**⚠️ STATUS:** SUHU EKSTREM - Heat warning\n`;
-      weatherContext += `**📋 TINDAKAN:**\n1. Tambah istirahat setiap jam\n2. Sediakan zona teduh\n3. Pantau gejala heat stress\n4. Atur shift ke pagi hari`;
+      weatherContext += `⚠️ STATUS: SUHU EKSTREM - Heat warning\n`;
+      weatherContext += `📋 TINDAKAN:\n1. Tambah istirahat setiap jam\n2. Sediakan zona teduh\n3. Pantau gejala heat stress\n4. Atur shift ke pagi hari`;
     } else if (weatherData.wind_speed > 40) {
-      weatherContext += `**💨 STATUS:** ANGIN KENCANG\n`;
-      weatherContext += `**📋 TINDAKAN:**\n1. Hentikan crane operation\n2. Amankan material ringan\n3. Gunakan komunikasi radio\n4. Batasi kerja di ketinggian`;
+      weatherContext += `💨 STATUS: ANGIN KENCANG\n`;
+      weatherContext += `📋 TINDAKAN:\n1. Hentikan crane operation\n2. Amankan material ringan\n3. Gunakan komunikasi radio\n4. Batasi kerja di ketinggian`;
     } else {
-      weatherContext += `**✅ STATUS:** KONDISI NORMAL\n`;
-      weatherContext += `**📋 TINDAKAN:** Lanjutkan operasi dengan monitoring rutin`;
+      weatherContext += `✅ STATUS: KONDISI NORMAL\n`;
+      weatherContext += `📋 TINDAKAN: Lanjutkan operasi dengan monitoring rutin`;
     }
     
     const contextMessage = { 
@@ -199,7 +201,7 @@ const Chatbot = ({ isOpen, onClose, weatherData }) => {
     setMessages([
       { 
         type: 'bot', 
-        content: 'Halo! Saya **Mining Safety & Operation Assistant** 🤖\n\nPercakapan telah direset. Ada yang bisa saya bantu?'
+        content: 'Halo! Saya Mining Safety & Operation Assistant 🤖\n\nPercakapan telah direset. Ada yang bisa saya bantu?'
       }
     ]);
   };
